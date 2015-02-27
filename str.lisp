@@ -32,6 +32,7 @@
    #:atom-str
    #:walk-str
    #:write-str
+   #:join-str
    ;;  Sym
    #:sym))
 
@@ -171,11 +172,20 @@
 		   (write-string (atom-str y) out))))
       (str<< x))))
 
+(defun join-str (glue &rest parts)
+  (let (g)
+    (with-output-to-string (out)
+      (walk-str (lambda (x)
+		  (when g
+		    (write-str out glue))
+		  (write-string x out)
+		  (setq g t))
+		parts))))
+
 ;;  SYM
 
 (defun sym (&rest parts)
-  (intern
-   (with-output-to-string (s)
-     (walk-str (lambda (x)
-		 (write-string (string-upcase x) s))
-	       parts))))
+  (intern (with-output-to-string (s)
+	    (walk-str (lambda (x)
+			(write-string (string-upcase x) s))
+		      parts))))
