@@ -34,7 +34,8 @@
    #:write-str
    #:join-str
    ;;  Sym
-   #:sym))
+   #:sym
+   #:kw))
 
 (in-package :str)
 
@@ -189,3 +190,10 @@
 	    (walk-str (lambda (x)
 			(write-string (string-upcase x) s))
 		      parts))))
+
+(defun kw (&rest parts)
+  (intern (with-output-to-string (s)
+            (walk-str (lambda (x)
+                        (write-string (string-upcase x) s))
+                      parts))
+          :keyword))
