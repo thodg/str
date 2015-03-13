@@ -1,7 +1,7 @@
 ;;
-;;  STR
+;;  STR  -  minimal library to ease strings rendering
 ;;
-;;  Copyright 2012,2013 Thomas de Grivel <thomas@lowh.net>
+;;  Copyright 2012-2015 Thomas de Grivel <thomas@lowh.net>
 ;;
 ;;  Permission to use, copy, modify, and distribute this software for any
 ;;  purpose with or without fee is hereby granted, provided that the above
@@ -16,20 +16,18 @@
 ;;  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ;;
 
-(in-package #:cl-user)
+(in-package :str)
 
-(defpackage #:str.system
-  (:use #:cl #:asdf))
+;;  Char
 
-(in-package #:str.system)
-
-(defsystem str
-  :name "str"
-  :author "Thomas de Grivel <thomas@lowh.net>"
-  :version "0.1"
-  :description "String library"
-  :components
-  ((:file "package")
-   (:file "char" :depends-on ("package"))
-   (:file "rope" :depends-on ("package"))
-   (:file "str" :depends-on ("package" "rope"))))
+(defmacro case-char (char &body cases)
+  (let ((g!char (gensym "CHAR-")))
+    `(let ((,g!char ,char))
+       (cond
+	 ,@(mapcar (lambda (case-decl)
+		     (destructuring-bind (match &rest match-body) case-decl
+		       (typecase match
+			 (string `((find ,g!char ,match) ,@match-body))
+			 (null `((null ,g!char) ,@match-body))
+			 (t `(,match ,@match-body)))))
+		   cases)))))
