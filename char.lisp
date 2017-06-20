@@ -24,10 +24,10 @@
   (let ((g!char (gensym "CHAR-")))
     `(let ((,g!char ,char))
        (cond
-	 ,@(mapcar (lambda (case-decl)
-		     (destructuring-bind (match &rest match-body) case-decl
-		       (typecase match
-			 (string `((find ,g!char ,match) ,@match-body))
-			 (null `((null ,g!char) ,@match-body))
-			 (t `(,match ,@match-body)))))
-		   cases)))))
+         ,@(mapcar (lambda (case-decl)
+                     (destructuring-bind (match &rest match-body) case-decl
+                       (typecase match
+                         (string `((find ,g!char ,match) ,@match-body))
+                         (null `((null ,g!char) ,@match-body))
+                         (t `(,match ,@match-body)))))
+                   cases)))))

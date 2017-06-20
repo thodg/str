@@ -23,15 +23,15 @@
 (defun rope-merge (rope)
   (let (result last str merged)
     (labels ((collect (x)
-	       (if last
-		   (setf (cdr last) (cons x nil)
-			 last (cdr last))
-		   (setf last (cons x nil)))
-	       (unless result
-		 (setf result last))
-	       (setf str nil))
-	     (collect-str ()
-	       (when str
+               (if last
+                   (setf (cdr last) (cons x nil)
+                         last (cdr last))
+                   (setf last (cons x nil)))
+               (unless result
+                 (setf result last))
+               (setf str nil))
+             (collect-str ()
+               (when str
                  (typecase str
                    (stream (collect (get-output-stream-string str))
                            (setf merged t
@@ -40,30 +40,30 @@
                       (setf str nil))))))
 
       (dolist (x rope)
-	(when (or (characterp x)
+        (when (or (characterp x)
                   (keywordp x)
                   (numberp x))
           (setq x (the string (atom-str x))))
-	(when (and (consp x)
+        (when (and (consp x)
                    (eq 'quote (car x)))
           (setq x (the string (atom-str (cadr x)))))
-	(cond ((stringp x)
-	       (typecase str
-		 (string (let ((w str))
-			   (setf str (make-string-output-stream))
-			   (write-string w str))
-			 (write-string x str))
-		 (stream (write-string x str))
-		 (null (setf str x))))
-	      ((null x)
-	       (setf merged t))
-	      (t
-	       (collect-str)
-	       (collect x))))
+        (cond ((stringp x)
+               (typecase str
+                 (string (let ((w str))
+                           (setf str (make-string-output-stream))
+                           (write-string w str))
+                         (write-string x str))
+                 (stream (write-string x str))
+                 (null (setf str x))))
+              ((null x)
+               (setf merged t))
+              (t
+               (collect-str)
+               (collect x))))
       (collect-str)
       (if merged
-	  (values result t)
-	  (values rope nil)))))
+          (values result t)
+          (values rope nil)))))
 
 (defun rope-nmerge (rope)
   (labels ((iter (x)
@@ -92,5 +92,5 @@
 (define-compiler-macro write-rope (&whole form rope &rest stream)
   (let ((merged (rope-merge rope)))
     (if (eq merged rope)
-	form
-	`(write-rope ,merged ,@stream))))
+        form
+        `(write-rope ,merged ,@stream))))

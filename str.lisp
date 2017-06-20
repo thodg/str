@@ -45,50 +45,50 @@
 
 (defun walk-str (fn str)
   (labels ((walk (x)
-	     (typecase x
-	       (string (funcall fn x))
-	       (sequence (map nil #'walk x))
-	       (t (funcall fn (atom-str x))))))
+             (typecase x
+               (string (funcall fn x))
+               (sequence (map nil #'walk x))
+               (t (funcall fn (atom-str x))))))
     (walk str)))
 
 (defun str (&rest parts)
   (with-output-to-string (s)
     (walk-str (lambda (x) (write-string x s))
-	      parts)))
+              parts)))
 
 (define-compiler-macro str (&whole form &rest parts)
   (let ((merged (rope-merge parts)))
     (if (eq merged parts)
-	form
-	`(str ,@merged))))
+        form
+        `(str ,@merged))))
 
 (defun write-str (stream &rest parts)
   (walk-str (lambda (x) (write-string x stream))
-	    parts))
+            parts))
 
 (define-compiler-macro write-str (&whole form stream &rest parts)
   (let ((merged (rope-merge parts)))
     (if (eq merged parts)
-	form
-	`(write-str ,stream ,@merged))))
+        form
+        `(write-str ,stream ,@merged))))
 
 (defun join-str (glue &rest parts)
   (let (g)
     (with-output-to-string (out)
       (walk-str (lambda (x)
-		  (when g
-		    (write-str out glue))
-		  (write-string x out)
-		  (setq g t))
-		parts))))
+                  (when g
+                    (write-str out glue))
+                  (write-string x out)
+                  (setq g t))
+                parts))))
 
 ;;  SYM
 
 (defun sym (&rest parts)
   (intern (with-output-to-string (s)
-	    (walk-str (lambda (x)
-			(write-string (string-upcase x) s))
-		      parts))))
+            (walk-str (lambda (x)
+                        (write-string (string-upcase x) s))
+                      parts))))
 
 (defun kw (&rest parts)
   (intern (with-output-to-string (s)
