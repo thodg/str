@@ -29,7 +29,7 @@
   "")
 
 (defmethod atom-str ((x symbol))
-  (string-downcase (symbol-name x)))
+  (symbol-name x))
 
 (defmethod atom-str ((x character))
   (make-string 1 :initial-element x))
